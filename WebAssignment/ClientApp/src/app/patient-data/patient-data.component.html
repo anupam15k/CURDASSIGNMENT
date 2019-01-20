@@ -1,0 +1,145 @@
+<div>
+
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      Patient Registration
+    </div>
+    <div class="panel-body">
+      <form novalidate (ngSubmit)="onSubmit()" [formGroup]="myform">
+        <div class="row">
+          <div class="form-group col-md-4">
+            <label>
+              <span>Full name</span>
+            </label>
+            <input type="text" class="form-control" placeholder="Your first name" formControlName="Name">
+
+            <div class="has-error" *ngIf="myform.get('Name').hasError('required') && myform.get('Name').touched">
+              Name is required
+            </div>
+            <div class="has-error" *ngIf="myform.get('Name').hasError('minlength') && myform.get('Name').touched">
+              Minimum of 2 characters
+            </div>
+          </div>
+          <div class="col-md-2"></div>
+          <div class="form-group col-md-4">
+            <label>
+              <span>SurName</span>
+            </label>
+            <input type="text" class="form-control" placeholder="Your SurName" formControlName="SurName">
+
+            <div class="has-error"
+                 *ngIf="myform.get('SurName').hasError('required') && myform.get('SurName').touched">
+              SurName is required
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-4">
+            <!--<div class="form-inline">-->
+            <label>
+              <span>DateOfBirth</span>
+            </label>
+            <div class="input-group">
+              <input class="form-control" placeholder="dd-mm-yyyy" name="dp" formControlName="DOB" navigation="arrows" ngbDatepicker #d="ngbDatepicker">
+              <span class="input-group-btn">
+                <button class="btn btn-default" (click)="d.toggle()"> <i class="glyphicon glyphicon-calendar"></i></button>
+              </span>
+            </div>
+            <!--</div>-->
+            <div class="has-error"
+                 *ngIf="myform.get('DOB').hasError('required') && myform.get('DOB').touched">
+              DateOfBirth is required
+            </div>
+          </div>
+
+
+          <div class="col-md-2"></div>
+
+          <div class="form-group col-md-4">
+            <div class="">
+              <label>
+                <span>Gender</span>
+              </label>
+              <select class="form-control" formControlName="Gender">
+                <option value="">-- Choose Gender --</option>
+                <option *ngFor="let gender of GenderList"
+                        [value]="gender">
+                  {{gender}}
+                </option>
+              </select>
+              <div class="has-error"
+                   *ngIf="myform.get('Gender').hasError('required') && myform.get('Gender').touched">
+                gender is required
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group  col-md-4">
+            <label>
+              <span>City</span>
+            </label>
+            <!--<input type="text" class="form-control" placeholder="Your City" formControlName="City">-->
+            <select class="form-control" formControlName="City">
+              <option value="">-- Select City --</option>
+              <option *ngFor="let t of Cities" value={{t.id}}>{{t.name}}</option>
+            </select>
+            <div class="has-error"
+                 *ngIf="myform.get('City').hasError('required') && myform.get('City').touched">
+              City is required
+            </div>
+          </div>
+
+          <div class="col-md-2"></div>
+
+          <div class="form-group  col-md-4">
+            <label>
+              <span>State</span>
+            </label>
+            <!--<input type="text" class="form-control" placeholder="Your State" formControlName="State">-->
+            <select class="form-control" formControlName="State" (change)="getCity($event)">
+              <option value="">-- Select State --</option>
+              <option *ngFor="let t of States" value={{t.id}}>{{t.name}}</option>
+            </select>
+            <div class="has-error"
+                 *ngIf="myform.get('State').hasError('required') && myform.get('State').touched">
+              State is required
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success" [disabled]="myform.invalid">Submit</button>
+      </form>
+    </div>
+
+    <toaster-container></toaster-container>
+
+    <table class="table table-bordered">
+      <thead style="background-color:lightblue;">
+        <tr>
+          <th> Name</th>
+          <th>SurName </th>
+          <th>DOB</th>
+          <th>Gender</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="patientData.length > 0">
+        <tr *ngFor="let pat of patientData">
+          <td> {{pat.name}} </td>
+          <td>{{pat.surName}}</td>
+          <td>{{pat.dob|date:'dd/MM/yyyy'}}</td>
+          <td>{{pat.gender}}</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="patientData.length == 0">
+        <tr>
+          <td>
+            "No Results found"
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
