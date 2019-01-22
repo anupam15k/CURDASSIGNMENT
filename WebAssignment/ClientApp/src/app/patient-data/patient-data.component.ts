@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { Http, Headers, Response } from '@angular/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateStruct, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -32,15 +33,13 @@ export class PatientDataComponent implements OnInit {
   model2: Date;
   Cities: any;
   States: any;
-  http: HttpClient;
   baseUrl: string;
 
 
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, private toasterService: ToasterService) {
-    this.http = http;
+  constructor(public http: Http, @Inject('BASE_URL') baseUrl: string, private toasterService: ToasterService) {
     this.baseUrl = baseUrl;
-    http.get<PatientData[]>(baseUrl + 'api/PatientData/GetPatient').subscribe(result => {
-      this.patientData = result;
+    http.get(baseUrl + 'api/PatientData/GetPatient').subscribe(result => {
+      this.patientData = result.json();
     }, error => console.error(error));
 
     //http.get(baseUrl + 'api/PatientData/Cities').subscribe(result => {
@@ -48,7 +47,7 @@ export class PatientDataComponent implements OnInit {
     //}, error => console.error(error));
 
     http.get(baseUrl + 'api/PatientData/GetStates').subscribe(result => {
-      this.States = result;
+      this.States = result.json();
     }, error => console.error(error));
   }
 
@@ -79,8 +78,38 @@ export class PatientDataComponent implements OnInit {
 
   onSubmit() {
     if (this.myform.valid && this.validatePatient()) {
-      console.log("Form Submitted!");
-      console.log(this.myform.value);
+      let params = new HttpParams();
+      var Name = this.myform.get('Name').value;
+      params = params.append('Name', Name);
+      var SurName = this.myform.get('SurName').value;
+      params = params.append('SurName', SurName);
+      var DOB = this.myform.get('DOB').value;
+      params = params.append('DOB', DOB);
+      var Gender = this.myform.get('Gender').value;
+      params = params.append('Gender', Gender);
+      var State = this.myform.get('State').value;
+      params = params.append('State', State);
+      var CityId = this.myform.get('City').value;
+      params = params.append('City', CityId);
+
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json; charset=utf-8');
+      var data = {
+        Name: this.myform.get('Name').value,
+        SurName: this.myform.get('SurName').value,
+        DOB: this.myform.get('DOB').value,
+        Gender: this.myform.get('Gender').value,
+        State: this.myform.get('State').value,
+        CityId: this.myform.get('City').value,
+      };
+
+
+      this.http.post(this.baseUrl + 'api/PatientData/SavePatient', data, { headers}).subscribe(result => {
+        this.http.get(this.baseUrl + 'api/PatientData/GetPatient').subscribe(result => {
+          this.patientData = result.json();
+        }, error => console.error(error));
+        this.toasterService.pop("success", "Patient fetched successfully");
+      }, error => this.toasterService.pop("error", error));
       this.myform.reset();
     }
   }
@@ -93,8 +122,8 @@ export class PatientDataComponent implements OnInit {
     let params = new HttpParams();
     params = params.append('StateId', event.target.value);
 
-    this.http.get<PatientData[]>(this.baseUrl + 'api/PatientData/GetCities', { params: params }).subscribe(result => {
-      this.Cities = result;
+    this.http.get(this.baseUrl + 'api/PatientData/GetCities/' + event.target.value).subscribe(result => {
+      this.Cities = result.json();
     }, error => console.error(error));
 
   }
@@ -172,6 +201,30 @@ export class PatientDataComponent implements OnInit {
     }
     return age;
   }
+
+  fetch() {
+    this.patientData = [];
+
+    let params = new HttpParams();
+    var Name = this.myform.get('Name').value;
+    params = params.append('Name', Name);
+    var SurName = this.myform.get('SurName').value;
+    params = params.append('SurName', SurName);
+    var DOB = this.myform.get('DOB').value;
+    params = params.append('DOB', DOB);
+    var Gender = this.myform.get('Gender').value;
+    params = params.append('Gender', Gender);
+    var State = this.myform.get('State').value;
+    params = params.append('State', State);
+    var CityId = this.myform.get('City').value;
+    params = params.append('City', CityId);
+
+    this.http.post(this.baseUrl + 'api/PatientData/Fetch', { params: params }).subscribe(result => {
+      this.patientData = result.json();
+      this.toasterService.pop("success", "Patient fetched successfully");
+    }, error => this.toasterService.pop("error", error));
+  }
+
 }
 
 interface PatientData {

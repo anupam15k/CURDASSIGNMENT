@@ -14,6 +14,7 @@ import { PatientDataComponent } from './patient-data/patient-data.component';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToasterModule, ToasterService } from 'angular2-toaster';
+import { HttpModule } from '@angular/http';
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import { ToasterModule, ToasterService } from 'angular2-toaster';
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
+    HttpModule,
     NgbModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
